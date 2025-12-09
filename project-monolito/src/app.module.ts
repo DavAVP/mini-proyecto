@@ -3,8 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TareasModule } from './tareas/tareas.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Tarea } from './tareas/entities/tarea.entity';
-
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,10 +14,10 @@ import { Tarea } from './tareas/entities/tarea.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'monolitoDB',
-      entities:[Tarea],
+      autoLoadEntities: true,
       synchronize: true,
     }),
-    TareasModule],
+    TareasModule, AuthModule],
   controllers: [AppController],
   providers: [AppService]
 

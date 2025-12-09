@@ -9,13 +9,21 @@ import { Repository } from 'typeorm';
 export class TareasService {
   @InjectRepository(Tarea)
   private readonly tareaRepository: Repository<Tarea>;
-  async create(createTareaDto: CreateTareaDto) {
-    const tarea = await this.tareaRepository.save(createTareaDto)
-    return tarea;
+
+  async create(createTareaDto: CreateTareaDto, userId: string) {
+    const tarea = await this.tareaRepository.create({
+      ...createTareaDto,
+      user: { id: userId }
+    });
+    return await this.tareaRepository.save(tarea);
   }
 
-  async findAll() {
-    return await this.tareaRepository.find();
+  async findAll(userId: string) {
+    return await this.tareaRepository.find({
+      where: {
+        user: { id: userId }
+      }
+    });
   }
 
   async findOne(id: string) {

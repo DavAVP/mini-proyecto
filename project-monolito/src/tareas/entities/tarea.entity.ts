@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { table } from "console";
+import { User } from "src/users/entities/user.entity";
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Tarea {
@@ -17,4 +19,7 @@ export class Tarea {
 
     @Column()
     estado: boolean;
+
+    @ManyToOne(() => User, (user) => user.tareas)
+    user: User;
 }

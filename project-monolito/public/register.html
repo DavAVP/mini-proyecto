@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Register</title>
+</head>
+<body>
+    <h1>Registro</h1>
+
+    <form id="registerForm">
+        <input type="email" id="email" placeholder="email" required />
+        <input type="password" id="password" placeholder="password" required minlength="6" />
+        <button type="submit">Registrar</button>
+    </form>
+
+    <p>¿Ya tienes cuenta? <a href="/public/login.html">Ir a login</a></p>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const resReg = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!resReg.ok) {
+                const err = await resReg.json().catch(()=>({ message: 'Error en registro' }));
+                alert('Registro falló: ' + (err.message || JSON.stringify(err)));
+                return;
+            }
+            const resLogin = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!resLogin.ok) {
+                alert('Registro ok pero login falló. Ve a login.');
+                window.location.href = '/public/login.html';
+                return;
+            }
+
+            const data = await resLogin.json();
+            localStorage.setItem('token', data.token);
+            window.location.href = '/public/tareas.html';
+        });
+    </script>
+</body>
+</html>

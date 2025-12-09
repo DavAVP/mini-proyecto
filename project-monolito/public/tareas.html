@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mis tareas</title>
+</head>
+<body>
+    <h1>Mis tareas</h1>
+
+    <button id="logout">Cerrar sesión</button>
+    <hr/>
+
+    <div>
+        <input id="materia" placeholder="Materia" />
+        <input id="titulo" placeholder="Título" />
+        <input id="descripcion" placeholder="Descripción" />
+        <select id="estado">
+        <option value="false">Pendiente</option>
+        <option value="true">Completada</option>
+        </select>
+        <button id="crear">Crear tarea</button>
+    </div>
+
+    <h2>Listado</h2>
+    <ul id="lista"></ul>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+        alert("No estás logueado bro");
+        window.location.href = "/public/login.html";
+        }
+
+        const lista = document.getElementById("lista");
+
+        async function cargarTareas() {
+
+            const res = await fetch("/api/tareas", {
+                headers: {
+                "Authorization": "Bearer " + token
+                }
+            });
+
+            if (!res.ok) {
+                alert("Error cargando tareas");
+                return;
+            }
+
+            const tareas = await res.json();
+
+            lista.innerHTML = "";
+            tareas.forEach(t => {
+                const li = document.createElement("li");
+                li.textContent = `${t.titulo} - ${t.materia} - ${t.descripcion} - estado: ${t.estado}`;
+                lista.appendChild(li);
+            });
+        }
+
+        document.getElementById("crear").addEventListener("click", async () => {
+        const materia = document.getElementById("materia").value;
+        const titulo = document.getElementById("titulo").value;
+        const descripcion = document.getElementById("descripcion").value;
+        const estado = document.getElementById("estado").value === "true";
+
+        const res = await fetch("/api/tareas", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ materia, titulo, descripcion, estado })
+        });
+
+        if (!res.ok) {
+            alert("Error creando tarea");
+            return;
+        }
+
+        cargarTareas();
+        });
+
+        document.getElementById("logout").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        window.location.href = "/public/login.html";
+        });
+
+        cargarTareas();
+    </script>
+</body>
+</html>
